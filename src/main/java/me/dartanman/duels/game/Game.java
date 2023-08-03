@@ -5,6 +5,10 @@ import me.dartanman.duels.stats.db.StatisticsDatabase;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import com.crafteconomy.blockchain.CraftBlockchainPlugin;
+import com.crafteconomy.blockchain.api.IntegrationAPI;
+import com.crafteconomy.blockchain.core.types.FaucetTypes;
+
 import java.util.UUID;
 
 public class Game
@@ -56,23 +60,37 @@ public class Game
 
         if(playerOne.getUniqueId().equals(player.getUniqueId()))
         {
-            // playerTwo wins
-            arena.sendMessage(playerTwo.getName() + " wins!");
-            UUID winnerUUID = playerTwo.getUniqueId();
-            UUID loserUUID = playerOne.getUniqueId();
-            db.setWins(winnerUUID, db.getWins(winnerUUID) + 1);
-            db.setLosses(loserUUID, db.getLosses(loserUUID) + 1);
+            // Player 2 wins
+            announceWinner(db, playerTwo, playerOne);
         }
         else
         {
             // playerOne wins
-            arena.sendMessage(playerOne.getName() + " wins!");
-            UUID winnerUUID = playerOne.getUniqueId();
-            UUID loserUUID = playerTwo.getUniqueId();
-            db.setWins(winnerUUID, db.getWins(winnerUUID) + 1);
-            db.setLosses(loserUUID, db.getLosses(loserUUID) + 1);
+            announceWinner(db, playerOne, playerTwo);
+            
         }
 
         arena.reset();
+    }
+
+    public void announceWinner(StatisticsDatabase db, Player winner, Player loser) {
+        IntegrationAPI api = CraftBlockchainPlugin.getAPI();
+
+        UUID winnerUUID = winner.getUniqueId();
+        UUID loserUUID = loser.getUniqueId();
+
+        arena.sendMessage(winner.getName() + " wins!");        
+
+        db.setWins(winnerUUID, db.getWins(winnerUUID) + 1);
+        db.setLosses(loserUUID, db.getLosses(loserUUID) + 1);
+        
+
+        // Faucet funds to winner
+        api.faucetCraft(api.getWallet(winnerUUID), "You were got 2 TOKENS for winning.", 2).thenAccept((tx) -> {
+            winner.sendMessage("You got 2 TOKENS for winning. You should see this in your account within 15 seconds");
+        });
+
+        // TODO: Query redis pubsub for array of paid/interacted accounts (do via API)
+
     }
 }

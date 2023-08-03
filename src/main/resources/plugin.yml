@@ -2,7 +2,7 @@ name: Duels
 author: Dartanman
 main: me.dartanman.duels.Duels
 version: ${project.version}
-api-version: 1.19
+api-version: 1.18
 commands:
   duel:
     description: Duels base command
