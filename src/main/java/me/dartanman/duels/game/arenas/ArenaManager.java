@@ -102,7 +102,7 @@ public class ArenaManager
             }
         }
         return null;
-    }
+    }    
 
     public Arena getArena(int id)
     {

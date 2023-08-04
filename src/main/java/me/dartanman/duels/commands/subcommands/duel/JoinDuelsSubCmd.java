@@ -53,16 +53,16 @@ public class JoinDuelsSubCmd extends DuelsSubCommand
             return true;
         }
 
-        // if(!(sender instanceof Player)) {
-        //     {
-        //         sender.sendMessage(ChatColor.RED + "You must be a Player to do that!");
-        //         return false;
-        //     }
-        // }
 
         // if args.length != 1, error
         if(args.length != 1) {
             incorrectArgs(sender, "/duels join [arena-name]");
+            return true;
+        }
+
+        // check if arena name is valid
+        if(plugin.getArenaManager().getArena(args[0]) == null) {
+            player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&cInvalid arena name: " + args[0]));
             return true;
         }
 
@@ -106,7 +106,7 @@ public class JoinDuelsSubCmd extends DuelsSubCommand
             Arena arena = am.getArena(args[0]);            
             if(arena == null)
             {
-                player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&Invalid arena id: " + args[0]));
+                player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&cInvalid arena id: " + args[0]));
                 return;
             }
             
