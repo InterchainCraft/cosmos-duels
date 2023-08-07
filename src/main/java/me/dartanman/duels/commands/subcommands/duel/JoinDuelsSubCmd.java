@@ -66,12 +66,17 @@ public class JoinDuelsSubCmd extends DuelsSubCommand
             return true;
         }
 
+        payForArenaPurchase(plugin, api, player, args[0]);
+        return true;
+    }
+
+    private static void payForArenaPurchase(Duels plugin, IntegrationAPI api, Player player, String arenaName) {
         Tx txinfo = new Tx(); // getTxID() -> auto generated. just a UUID [/wallet pending shows all]
         txinfo.setFromUUID(player.getUniqueId());
         txinfo.setToWalletAsServer(); // maybe a contract in the future?
-        txinfo.setCraftAmount(1); // bets of just 1 JUNOX (1mil ujunox)
+        txinfo.setUCraftAmount(1_000_000); // bets of just 1 JUNOX (1mil ujunox)
         txinfo.setDescription("Purchase bet for 1JUNOX");
-        txinfo.setFunction(purchaseSingleBet(plugin, plugin.getArenaManager(), player, args));
+        txinfo.setFunction(purchaseSingleBet(plugin, plugin.getArenaManager(), player, arenaName));
         
         txinfo.setRedisMinuteTTL(15);
 
@@ -79,19 +84,16 @@ public class JoinDuelsSubCmd extends DuelsSubCommand
         txinfo.setSendDescMessage(true);
         txinfo.setSendWebappLink(true);
 
+        player.sendMessage("");
         ErrorTypes error = txinfo.submit();
         if(error == ErrorTypes.SUCCESS) {
-            // Util.colorMsg(sender,  + txinfo.getTxID());
-            api.sendTxIDClickable(sender, txinfo.getTxID().toString(), "\n&eBetting Transaction created successfully\n%value%");
+            // api.sendTxIDClickable(player, txinfo.getTxID().toString(), "\n&eBetting Transaction created successfully\n%value%");
         } else {            
             player.sendMessage(ChatColor.translateAlternateColorCodes('&', "Error: " + error.toString()));
         }
-
-        return true;
-        
     }
     
-    public static Consumer<UUID> purchaseSingleBet(Duels plugin, ArenaManager am, Player player, String[] args) {
+    public static Consumer<UUID> purchaseSingleBet(Duels plugin, ArenaManager am, Player player, String arenaName) {
         Consumer<UUID> purchase = (uuid) -> {  
 
             String name = getNameIfOnline(uuid);                
@@ -103,10 +105,10 @@ public class JoinDuelsSubCmd extends DuelsSubCommand
                 return;
             }            
 
-            Arena arena = am.getArena(args[0]);            
+            Arena arena = am.getArena(arenaName);            
             if(arena == null)
             {
-                player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&cInvalid arena id: " + args[0]));
+                player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&cInvalid arena id: " + arenaName));
                 return;
             }
             
@@ -120,13 +122,7 @@ public class JoinDuelsSubCmd extends DuelsSubCommand
             Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
                 public void run() {
                     arena.addPlayer(player);
-                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&aJoined arena: " + arena.getName()));                    
-
-                     // if 2 players are in the arena, start it
-                    if(arena.getPlayers().size() >= 2)
-                    {                
-                        arena.start();
-                    }
+                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&aJoined arena: " + arena.getName()));
                 }
             }, 1L);
 

@@ -38,6 +38,8 @@ public class DuelTabCompleter implements TabCompleter
             recommend.add("kits");
             recommend.add("loadoldstats");
             recommend.add("stats");
+            recommend.add("menu");
+            recommend.add("arenas");
         }
         else if (args.length == 2)
         {

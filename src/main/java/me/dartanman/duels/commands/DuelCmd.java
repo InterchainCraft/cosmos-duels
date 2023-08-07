@@ -10,6 +10,7 @@ import me.dartanman.duels.commands.subcommands.stats.GetStatsDuelsSubCmd;
 import me.dartanman.duels.commands.subcommands.stats.LeaderboardDuelsSubCmd;
 import me.dartanman.duels.commands.subcommands.stats.LoadStatsDuelsSubCmd;
 import me.dartanman.duels.commands.subcommands.stats.StatsFileToSQLCmd;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -36,14 +37,17 @@ public class DuelCmd implements CommandExecutor
         new GetStatsDuelsSubCmd(plugin);
         new LeaderboardDuelsSubCmd(plugin);
         new StatsFileToSQLCmd(plugin);
+        new ArenasUISubCmd(plugin);
+        new MainMenuSubCmd(plugin);
     }
 
+    // CommandExecutor
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args)
     {
         if(args.length == 0)
         {
-            sender.sendMessage("Try /duels help");
+            Bukkit.dispatchCommand(sender, "duels menu");
             return true;
         }
         else
