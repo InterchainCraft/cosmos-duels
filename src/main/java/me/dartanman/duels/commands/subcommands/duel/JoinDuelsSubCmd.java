@@ -17,6 +17,7 @@ import com.crafteconomy.blockchain.CraftBlockchainPlugin;
 import com.crafteconomy.blockchain.api.IntegrationAPI;
 import com.crafteconomy.blockchain.core.types.ErrorTypes;
 import com.crafteconomy.blockchain.transactions.Tx;
+import com.crafteconomy.blockchain.utils.Util;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -96,9 +97,8 @@ public class JoinDuelsSubCmd extends DuelsSubCommand
     public static Consumer<UUID> purchaseSingleBet(Duels plugin, ArenaManager am, Player player, String arenaName) {
         Consumer<UUID> purchase = (uuid) -> {  
 
-            String name = getNameIfOnline(uuid);                
-            // put logic here for business license
-            Bukkit.broadcastMessage("[COMPLETE] Purchase bet for: " + name + " == " + uuid.toString() + "\n"); 
+            // String name = getNameIfOnline(uuid);                               
+            Util.colorMsg(uuid, "&aSuccess&7: &fYour bet purchase was processed!\n");
 
             if(am.getArena(player) != null) {
                 player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&cYou have already joined an arena"));                
