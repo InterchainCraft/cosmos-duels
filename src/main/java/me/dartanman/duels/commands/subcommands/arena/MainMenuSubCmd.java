@@ -38,15 +38,16 @@ public class MainMenuSubCmd extends DuelsSubCommand implements Listener
 		menuInv = Bukkit.createInventory(null, rows, InvName);
 
         UIHelper.createDisplay(menuInv, Material.GRASS_BLOCK, 10, "&e&lSpawn", new ArrayList<String>());
-        UIHelper.createDisplay(menuInv, Material.BOOK, 12, "&f&lArenas", new ArrayList<String>());
-        // UIHelper.createDisplay(menuInv, Material.DIAMOND_SWORD, 14, "&a&lJoin Duel", new ArrayList<String>());
+        UIHelper.createDisplay(menuInv, Material.BOOK, 12, "&f&lArenas", new ArrayList<String>());        
         UIHelper.createDisplay(menuInv, Material.IRON_CHESTPLATE, 14, "&7&oKits Coming Soon...", new ArrayList<String>());
+        UIHelper.createDisplay(menuInv, Material.BOOK, 16, "&e&lConnect Wallet", new ArrayList<String>());
 
         // create an array which links the slot number to the command to run for the player on click
         slotToCommand = new HashMap<Integer, String>();
         slotToCommand.put(10, "spawn");
         slotToCommand.put(12, "duels arenas");
         slotToCommand.put(14, "duels kits list");
+        slotToCommand.put(16, "gencode"); // from integration plugin
     }
 
     @Override
