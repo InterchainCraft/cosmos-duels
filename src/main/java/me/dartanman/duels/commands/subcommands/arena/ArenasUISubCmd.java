@@ -1,9 +1,7 @@
 package me.dartanman.duels.commands.subcommands.arena;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -93,28 +91,29 @@ public class ArenasUISubCmd extends DuelsSubCommand implements Listener
 	}
 
 	private String getArenaTitle(Arena a) {
-		String itemName = "Error";		
+		String itemName = "Error ";		
 		switch (a.getGameState()) {
 			case IDLE:
-				itemName = "&a&lJoin Arena: " + a.getId();
+				itemName = "&a&lJoin Arena: ";
 				break;
 			case COUNTDOWN:
-				itemName = "&e&lArena Starting: " + a.getId();
+				itemName = "&e&lArena Starting: ";
 				break;
 			case PLAYING:
-				itemName = "&c&lArena Live: " + a.getId();
+				itemName = "&c&lArena Live: ";
 				break;
 			default:
 				break;
 		}
 
-		return itemName;
+		return itemName + a.getName();
 	}
 
 	private List<String> getArenaItemLore(Arena a) {
 		List<String> lore = new ArrayList<String>();
-		lore.add("&fArena: &f" + a.getName());
-		lore.add("&fid: &e" + Integer.toString(a.getId()));
+		lore.add("&fArena: &f" + a.getName());		
+		lore.add("&7");
+		lore.add("&fPending Signers: &f" + getPendingSignersNames(a).toString());
 		lore.add("&7");
 		lore.add("&fPlayers: ");
 
@@ -130,6 +129,9 @@ public class ArenasUISubCmd extends DuelsSubCommand implements Listener
 				lore.add("&7- &e");
 			}
 		}	
+
+		lore.add("&7");
+		lore.add("&7&o(( id: " + Integer.toString(a.getId()) + "&7&o ))");
 
 		return lore;
 	}
@@ -149,6 +151,15 @@ public class ArenasUISubCmd extends DuelsSubCommand implements Listener
 			default:
 				return Material.BARRIER;
 		}
+	}
+
+	private List<String> getPendingSignersNames(Arena a) {
+		List<String> names = new ArrayList<String>();
+		for (UUID uuid : a.getPendingSigners()) {
+			names.add(getNameFromUUID(uuid));
+		}
+
+		return names;
 	}
 
 	private String getNameFromUUID(UUID uuid) {

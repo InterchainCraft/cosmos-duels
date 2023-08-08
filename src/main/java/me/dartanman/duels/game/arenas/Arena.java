@@ -15,9 +15,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.checkerframework.checker.units.qual.C;
 
+import com.crafteconomy.blockchain.utils.Util;
+
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 public class Arena
@@ -38,12 +42,17 @@ public class Arena
     private Countdown countdown;
     private int countdownSeconds;
 
+    private final HashSet<UUID> pendingSigns;
+
     public Arena(Duels plugin, int id, String name, Location spawnOne, Location spawnTwo, Location lobby, int countdownSeconds)
     {
         this.plugin = plugin;
 
         this.id = id;
         this.name = name;
+
+        // new set of size 2
+        this.pendingSigns = new HashSet<>(2);
 
         this.gameState = GameState.IDLE;
 
@@ -64,6 +73,8 @@ public class Arena
         this.name = arenaConfig.getName();
 
         this.gameState = GameState.IDLE;
+        
+        this.pendingSigns = new HashSet<>(2);
 
         this.spawnOne = arenaConfig.getSpawnOne();
         this.spawnTwo = arenaConfig.getSpawnTwo();
@@ -79,23 +90,20 @@ public class Arena
      */
 
     public void reset()
-    {
+    {        
         this.game = new Game(this);
+        
         this.countdown = new Countdown(plugin, this, countdownSeconds);
-        Player p1 = Bukkit.getPlayer(getPlayerOne());
-        Player p2 = Bukkit.getPlayer(getPlayerTwo());
-        if(p1 != null)
-        {
-            PlayerRestoration.restorePlayer(p1, false);
+        for(UUID uuid : this.getPlayers()) {
+            Player p = Bukkit.getPlayer(uuid);
+            if(p != null) {
+                PlayerRestoration.restorePlayer(p, false);
+            }
         }
-        if(p2 != null)
-        {
-            PlayerRestoration.restorePlayer(p2, false);
-        }
-
+        
         players.clear();
+        pendingSigns.clear();
         gameState = GameState.IDLE;
-
     }
 
     public void start()
@@ -147,6 +155,9 @@ public class Arena
         player.setHealth(20);
         player.setFoodLevel(20);
 
+        // remove from pending
+        pendingSigns.remove(player.getUniqueId());
+
         if(players.size() == 2)
         {
             start();
@@ -156,6 +167,7 @@ public class Arena
     public void removePlayer(Player player)
     {
         players.remove(player.getUniqueId());
+        pendingSigns.remove(player.getUniqueId());
         if(gameState == GameState.COUNTDOWN)
         {
             countdown.cancel();
@@ -164,6 +176,35 @@ public class Arena
             gameState = GameState.IDLE;
         }
         this.countdown = new Countdown(plugin, this, countdownSeconds);
+    }
+    
+    public Optional<String> addPendingSigner(Player player)
+    {
+        // check if there are already 2 pending signers, if so error
+        if(pendingSigns.size() == 2) {            
+            return Optional.of(Util.color("&cThere are already 2 pending signers for this arena"));
+            // else if pending == 1 and players.size() is one already sgind
+        } else if (pendingSigns.size() == 1 && players.size() == 1) {            
+            return Optional.of(Util.color("&cThere is already 1 pending signer for this arena."));
+            // else there are 0 signers and already 2 players
+        } else if (players.size() == 2) {
+            return Optional.of(Util.color("&cThere are already 2 players in this arena."));
+        }
+
+        pendingSigns.add(player.getUniqueId());
+
+        // create a bukkit runnable which in X seconds removes the player from pending signers
+        // this is incase the person does not sign, so it opens it up to someone else.
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            pendingSigns.remove(player.getUniqueId());
+        }, 20 * Duels.EXPIRE_SECONDS);
+
+        return Optional.empty();
+    }
+
+    public boolean removePendingSigner(UUID uuid)
+    {
+        return pendingSigns.remove(uuid);
     }
 
     public List<UUID> getPlayers()
@@ -194,6 +235,11 @@ public class Arena
     public UUID getPlayerTwo()
     {
         return players.get(1);
+    }
+
+    public HashSet<UUID> getPendingSigners()
+    {
+        return pendingSigns;
     }
 
     /*

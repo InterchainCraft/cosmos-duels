@@ -38,7 +38,7 @@ public class MainMenuSubCmd extends DuelsSubCommand implements Listener
 		menuInv = Bukkit.createInventory(null, rows, InvName);
 
         UIHelper.createDisplay(menuInv, Material.GRASS_BLOCK, 10, "&e&lSpawn", new ArrayList<String>());
-        UIHelper.createDisplay(menuInv, Material.BOOK, 12, "&f&lArenas", new ArrayList<String>());        
+        UIHelper.createDisplay(menuInv, Material.DIAMOND_SWORD, 12, "&f&lArenas", new ArrayList<String>());        
         UIHelper.createDisplay(menuInv, Material.IRON_CHESTPLATE, 14, "&7&oKits Coming Soon...", new ArrayList<String>());
         UIHelper.createDisplay(menuInv, Material.BOOK, 16, "&e&lConnect Wallet", new ArrayList<String>());
 

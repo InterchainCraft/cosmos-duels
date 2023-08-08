@@ -20,13 +20,14 @@ import com.crafteconomy.blockchain.transactions.Tx;
 import com.crafteconomy.blockchain.utils.Util;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
 
 public class JoinDuelsSubCmd extends DuelsSubCommand
 {
 
-    IntegrationAPI api;
+    IntegrationAPI api;    
 
     public JoinDuelsSubCmd(Duels plugin)
     {
@@ -62,8 +63,15 @@ public class JoinDuelsSubCmd extends DuelsSubCommand
         }
 
         // check if arena name is valid
-        if(plugin.getArenaManager().getArena(args[0]) == null) {
+        Arena a = plugin.getArenaManager().getArena(args[0]);
+        if(a == null) {
             player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&cInvalid arena name: " + args[0]));
+            return true;
+        }
+        
+        Optional<String> errorRes = a.addPendingSigner(player);
+        if(errorRes.isPresent()) {
+            player.sendMessage(errorRes.get());
             return true;
         }
 
@@ -71,28 +79,53 @@ public class JoinDuelsSubCmd extends DuelsSubCommand
         return true;
     }
 
+    // TODO: Variable bets here
     private static void payForArenaPurchase(Duels plugin, IntegrationAPI api, Player player, String arenaName) {
         Tx txinfo = new Tx(); // getTxID() -> auto generated. just a UUID [/wallet pending shows all]
         txinfo.setFromUUID(player.getUniqueId());
-        txinfo.setToWalletAsServer(); // maybe a contract in the future?
-        txinfo.setUCraftAmount(1_000_000); // bets of just 1 JUNOX (1mil ujunox)
-        txinfo.setDescription("Purchase bet for 1JUNOX");
+        txinfo.setToWalletAsServer(); // contract in the future?        
+        txinfo.setUCraftAmount(Duels.BET_AMOUNT); // bets of just 1 JUNOX (1mil ujunox)        
+        txinfo.setDescription("Purchased 1 bet for arena " + arenaName);
         txinfo.setFunction(purchaseSingleBet(plugin, plugin.getArenaManager(), player, arenaName));
-        
-        txinfo.setRedisMinuteTTL(15);
+                
+        txinfo.setRedisMinuteTTL((int) Math.ceil(Duels.EXPIRE_SECONDS/60));
+        txinfo.setConsumerOnExpire(expiredTime(plugin, txinfo, plugin.getArenaManager(), arenaName));
 
         txinfo.setIncludeTxClickable(true);
         txinfo.setSendDescMessage(true);
         txinfo.setSendWebappLink(true);
 
+        // save txinfo.getTxID() to a pending array after submit is successful. This way we can clear all later on reload & msg the members
+
         player.sendMessage("");
         ErrorTypes error = txinfo.submit();
         if(error == ErrorTypes.SUCCESS) {
             // api.sendTxIDClickable(player, txinfo.getTxID().toString(), "\n&eBetting Transaction created successfully\n%value%");
+            plugin.pendingTxs.add(txinfo);
+
+            // let the player know they have Duels.addPendingSigner seconds to sign the Tx
+            player.sendMessage(Util.color("\n&c[PENDING] &fYou have &e" + Duels.EXPIRE_SECONDS + " seconds &fto sign the Tx. &7&o(or it expires)"));            
+
         } else {            
             player.sendMessage(ChatColor.translateAlternateColorCodes('&', "Error: " + error.toString()));
-        }
+        }        
     }
+
+    public static Consumer<UUID> expiredTime(Duels plugin, Tx txinfo, ArenaManager am, String arenaName) {
+        // send a player that their bid for arenaName expired. Then remove them from pending
+        Consumer<UUID> expired = (uuid) -> {
+            String name = getNameIfOnline(uuid);
+            if(name.isEmpty()) {
+                return;
+            }
+            Util.colorMsg(uuid, "\n&c&l[!] Error&7: &fYour bet purchased for arena: " + arenaName + " expired.\n");
+            am.getArena(arenaName).removePendingSigner(uuid); 
+                        
+            plugin.pendingTxs.remove(txinfo);
+        };
+        return expired;
+    }
+    
     
     public static Consumer<UUID> purchaseSingleBet(Duels plugin, ArenaManager am, Player player, String arenaName) {
         Consumer<UUID> purchase = (uuid) -> {  
@@ -141,16 +174,4 @@ public class JoinDuelsSubCmd extends DuelsSubCommand
         }
         return playername;
     }
-
-    // private Arena findFirstArena()
-    // {
-    //     for(Arena arena : plugin.getArenaManager().getArenaList())
-    //     {
-    //         if(arena.getGameState() == GameState.IDLE)
-    //         {
-    //             return arena;
-    //         }
-    //     }
-    //     return null;
-    // }
 }
