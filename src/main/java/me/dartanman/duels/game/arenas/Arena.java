@@ -15,6 +15,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.checkerframework.checker.units.qual.C;
 
+import com.crafteconomy.blockchain.CraftBlockchainPlugin;
+import com.crafteconomy.blockchain.api.IntegrationAPI;
 import com.crafteconomy.blockchain.utils.Util;
 
 import java.util.ArrayList;
@@ -43,6 +45,8 @@ public class Arena
     private int countdownSeconds;
 
     private final HashSet<UUID> pendingSigns;
+
+    private static final IntegrationAPI api = CraftBlockchainPlugin.getAPI();
 
     public Arena(Duels plugin, int id, String name, Location spawnOne, Location spawnTwo, Location lobby, int countdownSeconds)
     {
@@ -170,11 +174,14 @@ public class Arena
         pendingSigns.remove(player.getUniqueId());
         if(gameState == GameState.COUNTDOWN)
         {
+            api.faucetUCraft(player.getUniqueId(), "refunding leaving payment", Duels.BET_AMOUNT);
+
             countdown.cancel();
             sendMessage(ChatColor.translateAlternateColorCodes('&',
                     Objects.requireNonNull(plugin.getConfig().getString("Messages.Player-Left-Cancelled"))));
             gameState = GameState.IDLE;
         }
+
         this.countdown = new Countdown(plugin, this, countdownSeconds);
     }
     
