@@ -182,6 +182,8 @@ public class Arena
 
         // TODO: Refund player for leaving go here or just in countdown? (i think here since its not a kill)
         api.faucetUCraft(player.getUniqueId(), "refunding leaving payment", Duels.BET_AMOUNT);
+        
+        Util.colorMsg(player.getUniqueId(), "&aSince you left early you will be getting back " + (Duels.BET_AMOUNT/1_000_000) + " coins.");
 
         this.countdown = new Countdown(plugin, this, countdownSeconds);
     }
