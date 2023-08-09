@@ -173,14 +173,15 @@ public class Arena
         players.remove(player.getUniqueId());
         pendingSigns.remove(player.getUniqueId());
         if(gameState == GameState.COUNTDOWN)
-        {
-            api.faucetUCraft(player.getUniqueId(), "refunding leaving payment", Duels.BET_AMOUNT);
-
+        {            
             countdown.cancel();
             sendMessage(ChatColor.translateAlternateColorCodes('&',
                     Objects.requireNonNull(plugin.getConfig().getString("Messages.Player-Left-Cancelled"))));
             gameState = GameState.IDLE;
         }
+
+        // TODO: Refund player for leaving go here or just in countdown? (i think here since its not a kill)
+        api.faucetUCraft(player.getUniqueId(), "refunding leaving payment", Duels.BET_AMOUNT);
 
         this.countdown = new Countdown(plugin, this, countdownSeconds);
     }
