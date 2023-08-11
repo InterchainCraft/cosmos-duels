@@ -6,6 +6,7 @@ import me.dartanman.duels.commands.subcommands.arena.*;
 import me.dartanman.duels.commands.subcommands.duel.JoinDuelsSubCmd;
 import me.dartanman.duels.commands.subcommands.duel.KitsDuelsSubCmd;
 import me.dartanman.duels.commands.subcommands.duel.LeaveDuelsSubCmd;
+import me.dartanman.duels.commands.subcommands.duel.SpectateDuelsSubCmd;
 import me.dartanman.duels.commands.subcommands.stats.GetStatsDuelsSubCmd;
 import me.dartanman.duels.commands.subcommands.stats.LeaderboardDuelsSubCmd;
 import me.dartanman.duels.commands.subcommands.stats.LoadStatsDuelsSubCmd;
@@ -17,12 +18,8 @@ import org.bukkit.command.CommandSender;
 
 public class DuelCmd implements CommandExecutor
 {
-
-    private final Duels plugin;
-
     public DuelCmd(Duels plugin)
     {
-        this.plugin = plugin;
         new JoinDuelsSubCmd(plugin);
         new ListArenasDuelsSubCmd(plugin);
         new HelpDuelsSubCmd(plugin);
@@ -39,6 +36,7 @@ public class DuelCmd implements CommandExecutor
         new StatsFileToSQLCmd(plugin);
         new ArenasUISubCmd(plugin);
         new MainMenuSubCmd(plugin);
+        new SpectateDuelsSubCmd(plugin);
     }
 
     // CommandExecutor

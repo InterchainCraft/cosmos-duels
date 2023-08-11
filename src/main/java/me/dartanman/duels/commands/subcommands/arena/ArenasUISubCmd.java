@@ -18,6 +18,7 @@ import com.crafteconomy.blockchain.utils.Util;
 
 import me.dartanman.duels.Duels;
 import me.dartanman.duels.commands.subcommands.DuelsSubCommand;
+import me.dartanman.duels.game.GameState;
 import me.dartanman.duels.game.arenas.Arena;
 import me.dartanman.duels.utils.UIHelper;
 
@@ -63,14 +64,25 @@ public class ArenasUISubCmd extends DuelsSubCommand implements Listener
 			}
 			String spliter = Util.color("&fArena: &f");
 
-			String arenaName = lore.get(0).split(spliter)[1];			
+			String arenaName = lore.get(0).split(spliter)[1];
 			
-			event.getWhoClicked().closeInventory();				
+			Arena arena = plugin.getArenaManager().getArena(arenaName);
+			if(arena == null) {
+				event.getWhoClicked().sendMessage(Util.color("&cError: &fArena "+arenaName+" not found."));
+				return;
+			}
+
+			final String subCmd;
+			if(arena.getGameState() == GameState.IDLE) {
+				subCmd = "duels join " + arenaName;
+			} else {
+				subCmd = "duels spectate " + arenaName;	
+			}
+
+			event.getWhoClicked().closeInventory();	
 			Bukkit.getScheduler().runTaskLater(plugin, () -> {
-				Bukkit.dispatchCommand(event.getWhoClicked(), "duels join " + arenaName);
+				Bukkit.dispatchCommand(event.getWhoClicked(), subCmd);
 			}, 1);
-		
-			
 		}
 	}
 

@@ -1,6 +1,7 @@
 package me.dartanman.duels.commands;
 
 import me.dartanman.duels.Duels;
+import me.dartanman.duels.game.arenas.Arena;
 import me.dartanman.duels.game.kits.Kit;
 import me.dartanman.duels.game.kits.KitManager;
 import org.bukkit.command.Command;
@@ -40,6 +41,7 @@ public class DuelTabCompleter implements TabCompleter
             recommend.add("stats");
             recommend.add("menu");
             recommend.add("arenas");
+            recommend.add("spectate");
         }
         else if (args.length == 2)
         {
@@ -53,6 +55,12 @@ public class DuelTabCompleter implements TabCompleter
                 recommend.add("create");
                 recommend.add("delete");
                 recommend.add("select");
+            } else if (args[0].equalsIgnoreCase("spectate"))
+            {                
+                for(Arena a : plugin.getArenaManager().getArenaList())
+                {
+                    recommend.add(a.getName());
+                }                
             }
         }
         else if (args.length == 3)
