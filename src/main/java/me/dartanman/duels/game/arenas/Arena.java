@@ -13,7 +13,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.units.qual.C;
+import org.bukkit.potion.PotionEffect;
 
 import com.crafteconomy.blockchain.CraftBlockchainPlugin;
 import com.crafteconomy.blockchain.api.IntegrationAPI;
@@ -102,6 +102,10 @@ public class Arena
             Player p = Bukkit.getPlayer(uuid);
             if(p != null) {
                 PlayerRestoration.restorePlayer(p, false);
+
+                for (PotionEffect effect : p.getActivePotionEffects()) {
+                    p.removePotionEffect(effect.getType());
+                } 
             }
         }
         
