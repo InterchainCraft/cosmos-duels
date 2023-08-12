@@ -13,6 +13,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.crafteconomy.blockchain.utils.Util;
 
@@ -22,30 +23,36 @@ import me.dartanman.duels.game.GameState;
 import me.dartanman.duels.game.arenas.Arena;
 import me.dartanman.duels.utils.UIHelper;
 
-public class ArenasUISubCmd extends DuelsSubCommand implements Listener
-{
-    private String InvName = Util.color("&8&lDuels Arena List");
+public class ArenasUISubCmd extends DuelsSubCommand implements Listener {
+
+	private String InvName = Util.color("&8&lDuels Arena List");
 	private int rows = 6 * 9;
 
-    public ArenasUISubCmd(Duels plugin)
-    {
-        super(plugin, "arenas");
+	private Inventory arenaInv = null;
+	private int refreshIntervalTicks = 20;
 
-        Bukkit.getServer().getPluginManager().registerEvents(this, plugin);
-    }
+	public ArenasUISubCmd(Duels plugin) {
+		super(plugin, "arenas");
 
-    @Override
-    public boolean execute(CommandSender sender, String[] args)
-    {        
-        if(!(sender instanceof Player)) {
+		arenaInv = generateUI();
+
+		Bukkit.getServer().getPluginManager().registerEvents(this, plugin);
+
+		// start refresh
+		refreshArenaGUI();
+	}
+
+	@Override
+	public boolean execute(CommandSender sender, String[] args) {
+		if (!(sender instanceof Player)) {
 			sender.sendMessage("You must be a player to use this command.");
 			return true;
 		}
 
-        Player p = (Player) sender;
-		p.openInventory(generateUI());
-        return true;
-    }
+		Player p = (Player) sender;
+		p.openInventory(arenaInv);
+		return true;
+	}
 
 	@EventHandler
 	public void onInventoryClick(InventoryClickEvent event) {
@@ -55,31 +62,31 @@ public class ArenasUISubCmd extends DuelsSubCommand implements Listener
 			if (clicked == null) {
 				return;
 			}
-			
+
 			event.setCancelled(true);
 
 			List<String> lore = clicked.getItemMeta().getLore();
-			if(lore.size() < 1) {
+			if (lore.size() < 1) {
 				return;
 			}
 			String spliter = Util.color("&fArena: &f");
 
 			String arenaName = lore.get(0).split(spliter)[1];
-			
+
 			Arena arena = plugin.getArenaManager().getArena(arenaName);
-			if(arena == null) {
-				event.getWhoClicked().sendMessage(Util.color("&cError: &fArena "+arenaName+" not found."));
+			if (arena == null) {
+				event.getWhoClicked().sendMessage(Util.color("&cError: &fArena " + arenaName + " not found."));
 				return;
 			}
 
 			final String subCmd;
-			if(arena.getGameState() == GameState.IDLE) {
+			if (arena.getGameState() == GameState.IDLE) {
 				subCmd = "duels join " + arenaName;
 			} else {
-				subCmd = "duels spectate " + arenaName;	
+				subCmd = "duels spectate " + arenaName;
 			}
 
-			event.getWhoClicked().closeInventory();	
+			event.getWhoClicked().closeInventory();
 			Bukkit.getScheduler().runTaskLater(plugin, () -> {
 				Bukkit.dispatchCommand(event.getWhoClicked(), subCmd);
 			}, 1);
@@ -90,20 +97,38 @@ public class ArenasUISubCmd extends DuelsSubCommand implements Listener
 		Inventory inv = Bukkit.createInventory(null, rows, InvName);
 
 		for (Arena a : plugin.getArenaManager().getArenaList()) {
-			Integer slot = a.getId() - 1;			
-						
-			Material statusMat = getArenaMaterialStatusBlock(a);	
+			Integer slot = a.getId() - 1;
+
+			Material statusMat = getArenaMaterialStatusBlock(a);
 			String title = getArenaTitle(a);
-			List<String> lore = getArenaItemLore(a);	
-			
+			List<String> lore = getArenaItemLore(a);
+
 			UIHelper.createDisplay(inv, statusMat, slot, title, lore);
 		}
 
 		return inv;
 	}
 
+	public void refreshArenaGUI() {
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				arenaInv = generateUI();
+
+				for (Player online : Bukkit.getOnlinePlayers()) {
+					if (online.getOpenInventory().getTitle().equals(InvName)) {
+						// System.out.println("Refreshing arena GUI for " + online.getName());
+											
+						online.getOpenInventory().getTopInventory().setContents(arenaInv.getContents());
+						online.updateInventory();
+					}
+				}
+			}		
+		}.runTaskTimerAsynchronously(plugin, 0, refreshIntervalTicks);
+	}
+
 	private String getArenaTitle(Arena a) {
-		String itemName = "Error ";		
+		String itemName = "Error ";
 		switch (a.getGameState()) {
 			case IDLE:
 				itemName = "&a&lJoin Arena: ";
@@ -123,7 +148,7 @@ public class ArenasUISubCmd extends DuelsSubCommand implements Listener
 
 	private List<String> getArenaItemLore(Arena a) {
 		List<String> lore = new ArrayList<String>();
-		lore.add("&fArena: &f" + a.getName());		
+		lore.add("&fArena: &f" + a.getName());
 		lore.add("&7");
 		lore.add("&fPending Signers: &f" + getPendingSignersNames(a).toString());
 		lore.add("&7");
@@ -140,7 +165,7 @@ public class ArenasUISubCmd extends DuelsSubCommand implements Listener
 			} else {
 				lore.add("&7- &e");
 			}
-		}	
+		}
 
 		lore.add("&7");
 		lore.add("&7&o(( id: " + Integer.toString(a.getId()) + "&7&o ))");
@@ -183,5 +208,3 @@ public class ArenasUISubCmd extends DuelsSubCommand implements Listener
 		return uuid.toString();
 	}
 }
-
-
