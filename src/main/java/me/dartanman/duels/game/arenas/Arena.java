@@ -250,6 +250,15 @@ public class Arena
     {
         return players.get(1);
     }
+    public String getPlayerOneName()
+    {
+        return getPlayerName(getPlayerOne());
+    }
+
+    public String getPlayerTwoName()
+    {
+        return getPlayerName(getPlayerTwo());
+    }
 
     public HashSet<UUID> getPendingSigners()
     {
@@ -283,5 +292,16 @@ public class Arena
     public void setGameState(GameState gameState)
     {
         this.gameState = gameState;
+    }
+
+    // static mewthod to get players in game name
+    private static String getPlayerName(UUID uuid)
+    {
+        Player p = Bukkit.getPlayer(uuid);
+        if(p != null)
+        {
+            return p.getName();
+        }
+        return uuid.toString();
     }
 }

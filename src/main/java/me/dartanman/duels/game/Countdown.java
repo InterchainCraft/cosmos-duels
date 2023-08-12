@@ -2,6 +2,8 @@ package me.dartanman.duels.game;
 
 import me.dartanman.duels.Duels;
 import me.dartanman.duels.game.arenas.Arena;
+
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -38,6 +40,10 @@ public class Countdown extends BukkitRunnable
 
     public void start()
     {
+        // run command from servertools to announce        
+        String cmd = "announce starting " + arena.getPlayerOneName() + " " + arena.getPlayerTwoName() + " " + arena.getName() + " " +this.seconds;
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd);
+
         if(seconds % 10 != 0)
             sendSeconds();
         runTaskTimer(plugin, 0L, 20L);

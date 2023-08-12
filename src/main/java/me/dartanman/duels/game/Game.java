@@ -1,5 +1,6 @@
 package me.dartanman.duels.game;
 
+import me.dartanman.duels.Duels;
 import me.dartanman.duels.game.arenas.Arena;
 import me.dartanman.duels.stats.db.StatisticsDatabase;
 import org.bukkit.Bukkit;
@@ -69,6 +70,19 @@ public class Game
             announceWinner(db, playerOne, playerTwo);
             
         }
+
+        // player 1 health left
+        int healthLeft1 = (int) playerOne.getHealth();
+        // player 2 health left
+        int healthLeft2 = (int) playerTwo.getHealth();
+
+        // get the non 0 one
+        int healthLeft = healthLeft1 == 0 ? healthLeft2 : healthLeft1;
+
+        // run command from servertools to announce        
+        String cmd = "announce winner " + arena.getPlayerOneName() + " " + arena.getPlayerTwoName() + " " + (Duels.BET_AMOUNT/1_000_000) + " " + healthLeft;
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd);
+        
 
         arena.reset();
     }
