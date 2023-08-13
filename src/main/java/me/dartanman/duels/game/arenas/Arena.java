@@ -295,7 +295,7 @@ public class Arena
     }
 
     // static mewthod to get players in game name
-    private static String getPlayerName(UUID uuid)
+    public static String getPlayerName(UUID uuid)
     {
         Player p = Bukkit.getPlayer(uuid);
         if(p != null)

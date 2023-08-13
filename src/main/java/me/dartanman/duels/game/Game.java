@@ -59,28 +59,22 @@ public class Game
 
         StatisticsDatabase db = arena.getStatisticsDatabase();
 
-        if(playerOne.getUniqueId().equals(player.getUniqueId()))
-        {
-            // Player 2 wins
-            announceWinner(db, playerTwo, playerOne);
+        Player winner, loser;
+        if(playerOne.getUniqueId().equals(player.getUniqueId())) {
+            winner = playerTwo;
+            loser = playerOne;
+        } else {            
+            winner = playerOne;
+            loser = playerTwo;   
         }
-        else
-        {
-            // playerOne wins
-            announceWinner(db, playerOne, playerTwo);
-            
-        }
+        announceWinner(db, winner, loser);
 
-        // player 1 health left
-        int healthLeft1 = (int) playerOne.getHealth();
-        // player 2 health left
-        int healthLeft2 = (int) playerTwo.getHealth();
 
-        // get the non 0 one
-        int healthLeft = healthLeft1 == 0 ? healthLeft2 : healthLeft1;
+        // get winners health left
+        int healthLeft = (int) winner.getHealth();
 
         // run command from servertools to announce        
-        String cmd = "announce winner " + arena.getPlayerOneName() + " " + arena.getPlayerTwoName() + " " + (Duels.BET_AMOUNT/1_000_000) + " " + healthLeft;
+        String cmd = "announce winner " + Arena.getPlayerName(winner.getUniqueId()) + " " + Arena.getPlayerName(loser.getUniqueId()) + " " + (Duels.BET_AMOUNT/1_000_000) + " " + healthLeft;
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd);
         
 
