@@ -44,6 +44,7 @@ public class MainMenuSubCmd extends DuelsSubCommand implements Listener
         slotToCommand.put(14, "duels kits list");
         slotToCommand.put(16, "gencode"); // from integration plugin		
         slotToCommand.put(28, "duels stats"); // from integration plugin		
+        slotToCommand.put(30, "wallet clearpending"); // from integration plugin		
     }
 
     @Override
@@ -68,6 +69,7 @@ public class MainMenuSubCmd extends DuelsSubCommand implements Listener
         UIHelper.createDisplay(menuInv, Material.IRON_CHESTPLATE, 14, "&7&oKits Coming Soon...", new ArrayList<String>());
         UIHelper.createDisplay(menuInv, Material.BOOK, 16, "&e&lConnect Wallet", new ArrayList<String>());
         UIHelper.createDisplay(menuInv, Material.NAME_TAG, 28, "&e&lYour Duel Statistics", new ArrayList<String>());		
+        UIHelper.createDisplay(menuInv, Material.REDSTONE, 30, "&c&lClear Pending Transactions", new ArrayList<String>());		
 
 		api.getCraftBalance(p.getUniqueId()).thenAccept(balance -> {
 			UIHelper.createDisplay(menuInv, Material.GOLD_INGOT, 34, "&e&l"+api.getTokenName()+" balance: " + balance, new ArrayList<String>());
