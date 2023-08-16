@@ -102,7 +102,18 @@ public class ArenaManager
             }
         }
         return null;
-    }    
+    } 
+    
+    // find an arena which the player is already pending
+    public Arena getPendingArena(Player player) {
+        UUID uuid = player.getUniqueId();
+        for(Arena arena : arenaList) {
+            if(arena.getPendingSigners().contains(uuid)) {
+                return arena;
+            }
+        }
+        return null;
+    }
 
     public Arena getArena(int id)
     {

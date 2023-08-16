@@ -55,6 +55,12 @@ public class JoinDuelsSubCmd extends DuelsSubCommand
             return true;
         }
 
+        // ensure the user is not already pending for another arena
+        if(plugin.getArenaManager().getPendingArena(player) != null) {
+            player.sendMessage(Util.color("\n&c&l[!] Error&7: &fYou are already pending for another arena.\n"));            
+            Util.clickableCommand(sender, "/wallet clearpending", "\n&7&o&nClick to clear pending Transactions");
+            return true;
+        }
 
         // if args.length != 1, error
         if(args.length != 1) {
