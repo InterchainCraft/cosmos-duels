@@ -10,8 +10,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitScheduler;
 
 import com.crafteconomy.blockchain.CraftBlockchainPlugin;
 import com.crafteconomy.blockchain.api.IntegrationAPI;
@@ -44,6 +42,11 @@ public class JoinDuelsSubCmd extends DuelsSubCommand
             return true;
         }
 
+        if(Duels.PAUSED) {
+            sender.sendMessage(Util.color("\n&c&l[!] Error&7: &fDuels are currently paused by Reece.\n"));
+            return true;
+        }
+
         Player player = (Player) sender;
         UUID uuid = player.getUniqueId();
 
@@ -59,6 +62,12 @@ public class JoinDuelsSubCmd extends DuelsSubCommand
         if(plugin.getArenaManager().getPendingArena(player) != null) {
             player.sendMessage(Util.color("\n&c&l[!] Error&7: &fYou are already pending for another arena.\n"));            
             Util.clickableCommand(sender, "/wallet clearpending", "\n&7&o&nClick to clear pending Transactions");
+            return true;
+        }
+
+        // check if player is already in a game
+        if(plugin.getArenaManager().getArena(player) != null) {
+            player.sendMessage(Util.color("\n&c&l[!] Error&7: &fYou are already in a game.\n")); 
             return true;
         }
 
