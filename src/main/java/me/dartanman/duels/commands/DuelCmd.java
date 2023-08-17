@@ -37,6 +37,7 @@ public class DuelCmd implements CommandExecutor
         new ArenasUISubCmd(plugin);
         new MainMenuSubCmd(plugin);
         new SpectateDuelsSubCmd(plugin);
+        new PauseArenasSubCmd(plugin);
     }
 
     // CommandExecutor

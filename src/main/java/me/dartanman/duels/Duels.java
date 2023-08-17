@@ -27,8 +27,10 @@ import com.crafteconomy.blockchain.utils.Util;
 public class Duels extends JavaPlugin
 {
 
+    public static boolean PAUSED = false;
+
     public static final int BET_AMOUNT = 1_000_000; // save this in the arena itself in the future, so people can set bets.
-    public static final int EXPIRE_SECONDS = 60;
+    public static final int EXPIRE_SECONDS = 120;
 
     private ArenaManager arenaManager;
     private KitManager kitManager;
