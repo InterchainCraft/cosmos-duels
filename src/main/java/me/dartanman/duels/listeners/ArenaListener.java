@@ -5,6 +5,7 @@ import me.dartanman.duels.game.GameState;
 import me.dartanman.duels.utils.PlayerRestoration;
 import me.dartanman.duels.game.arenas.Arena;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
@@ -30,6 +31,14 @@ public class ArenaListener implements Listener
     public void onJoin(PlayerJoinEvent event)
     {
         Player player = event.getPlayer();
+        
+        // if player is spectator, move them to lobby and set as gamemode survival
+        if(player.getGameMode() == GameMode.SPECTATOR)
+        {
+            player.setGameMode(GameMode.SURVIVAL);                
+            Bukkit.dispatchCommand(player, "spawn");            
+        }
+
         PersistentDataContainer pdc = player.getPersistentDataContainer();
         if(pdc.has(new NamespacedKey(plugin, "world"), PersistentDataType.STRING))
         {

@@ -4,6 +4,7 @@ import me.dartanman.duels.Duels;
 import me.dartanman.duels.commands.subcommands.DuelsSubCommand;
 import me.dartanman.duels.game.arenas.Arena;
 
+import org.bukkit.GameMode;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -41,8 +42,10 @@ public class SpectateDuelsSubCmd extends DuelsSubCommand {
             return true;
         }        
         
-        player.teleport(arena.getLobby());    
-        Util.colorMsg(sender, "&aSpectating arena: " + arena.getName());
+        player.teleport(arena.getLobby());        
+        player.setGameMode(GameMode.SPECTATOR);
+        Util.colorMsg(sender, "&aSpectating arena: " + arena.getName());        
+        Util.clickableCommand(sender, "/duels leave", "&e/duels leave &fto stop specating");
 
         return true;
     }

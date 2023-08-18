@@ -5,9 +5,14 @@ import me.dartanman.duels.commands.subcommands.DuelsSubCommand;
 import me.dartanman.duels.game.GameState;
 import me.dartanman.duels.game.arenas.Arena;
 import me.dartanman.duels.utils.PlayerRestoration;
+
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import com.crafteconomy.blockchain.utils.Util;
 
 import java.util.Objects;
 
@@ -21,18 +26,28 @@ public class LeaveDuelsSubCmd extends DuelsSubCommand
     @Override
     public boolean execute(CommandSender sender, String[] args)
     {
-        if(!sender.hasPermission("duels.leave"))
-        {
-            noPerm(sender);
-            return true;
-        }
+        // if(!sender.hasPermission("duels.leave"))
+        // {
+        //     noPerm(sender);
+        //     return true;
+        // }
         if(sender instanceof Player player)
         {
+
+            // if player is spectator, move them to lobby and set as gamemode survival
+            if(player.getGameMode() == GameMode.SPECTATOR)
+            {
+                player.setGameMode(GameMode.SURVIVAL);                
+                Bukkit.dispatchCommand(player, "spawn");                
+                Util.colorMsg(sender, "&aYou have left spectating!");
+                return true;
+            }
+
             if(args.length == 0)
             {
                 Arena arena = plugin.getArenaManager().getArena(player);
                 if(arena == null)
-                {
+                {                    
                     player.sendMessage(ChatColor.RED + "You are not currently in a Duel!");
                     return true;
                 }
