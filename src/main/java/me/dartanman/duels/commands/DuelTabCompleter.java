@@ -43,6 +43,7 @@ public class DuelTabCompleter implements TabCompleter
             recommend.add("arenas");
             recommend.add("spectate");
             recommend.add("pause");
+            recommend.add("setbet");
         }
         else if (args.length == 2)
         {

@@ -44,18 +44,20 @@ public class Arena
     private Countdown countdown;
     private int countdownSeconds;
 
+    // TODO: show in UI as well
+    private long uTokenBetAmount;
+
     private final HashSet<UUID> pendingSigns;
 
     private static final IntegrationAPI api = CraftBlockchainPlugin.getAPI();
 
-    public Arena(Duels plugin, int id, String name, Location spawnOne, Location spawnTwo, Location lobby, int countdownSeconds)
+    public Arena(Duels plugin, int id, String name, Location spawnOne, Location spawnTwo, Location lobby, int countdownSeconds, long uTokenBetAmount)
     {
         this.plugin = plugin;
 
         this.id = id;
         this.name = name;
-
-        // new set of size 2
+        
         this.pendingSigns = new HashSet<>(2);
 
         this.gameState = GameState.IDLE;
@@ -67,6 +69,7 @@ public class Arena
         this.game = new Game(this);
         this.countdownSeconds = countdownSeconds;
         this.countdown = new Countdown(plugin, this, countdownSeconds);
+        this.uTokenBetAmount = uTokenBetAmount;
     }
 
     public Arena(Duels plugin, ArenaConfig arenaConfig)
@@ -185,11 +188,15 @@ public class Arena
         }
 
         // TODO: Refund player for leaving go here or just in countdown? (i think here since its not a kill)
-        api.faucetUCraft(player.getUniqueId(), "refunding leaving payment", Duels.BET_AMOUNT);
+        api.faucetUCraft(player.getUniqueId(), "refunding leaving payment", getuTokenBetAmount());
         
-        Util.colorMsg(player.getUniqueId(), "&aSince you left early you will be getting back " + (Duels.BET_AMOUNT/1_000_000) + " coins.");
+        Util.colorMsg(player.getUniqueId(), "&aSince you left early you will be getting back " + (getuTokenBetAmount()/1_000_000) + " coins.");
 
         this.countdown = new Countdown(plugin, this, countdownSeconds);
+    }
+
+    public long getuTokenBetAmount() {
+        return uTokenBetAmount;
     }
     
     public Optional<String> addPendingSigner(Player player)

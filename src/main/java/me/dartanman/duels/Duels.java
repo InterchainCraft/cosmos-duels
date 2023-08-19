@@ -28,9 +28,8 @@ public class Duels extends JavaPlugin
 {
 
     public static boolean PAUSED = false;
-
-    public static final int BET_AMOUNT = 1_000_000; // save this in the arena itself in the future, so people can set bets.
-    public static final int EXPIRE_SECONDS = 120;
+    
+    public static final int EXPIRE_SECONDS = 300;
 
     private ArenaManager arenaManager;
     private KitManager kitManager;
@@ -81,8 +80,8 @@ public class Duels extends JavaPlugin
 
         for(Arena arena : arenaManager.getArenaList())
         {                        
-            for(UUID uuid : arena.getPlayers()) {
-                api.faucetUCraft(uuid, "returning funds from reloaded plugin", BET_AMOUNT);
+            for(UUID uuid : arena.getPlayers()) {                
+                api.faucetUCraft(uuid, "returning funds from reloaded plugin", arena.getuTokenBetAmount());
 
                 Util.colorMsg(uuid, "\n&c&l[!] &fThe plugin has reloaded. Since you were in a game, your funds are being returned to you within 15 seconds.\n");
 

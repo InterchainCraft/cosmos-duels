@@ -67,35 +67,32 @@ public class Game
             winner = playerOne;
             loser = playerTwo;   
         }
-        announceWinner(db, winner, loser);
-
-
-        // get winners health left
+        long uTokenWinAmount = arena.getuTokenBetAmount() * 2;
+        announceWinner(db, winner, loser, uTokenWinAmount);
+        
         int healthLeft = (int) winner.getHealth();
 
         // run command from servertools to announce        
-        String cmd = "announce winner " + Arena.getPlayerName(winner.getUniqueId()) + " " + Arena.getPlayerName(loser.getUniqueId()) + " " + (Duels.BET_AMOUNT/1_000_000) + " " + healthLeft;
+        String cmd = "announce winner " + Arena.getPlayerName(winner.getUniqueId()) + " " + Arena.getPlayerName(loser.getUniqueId()) + " " + (uTokenWinAmount/1_000_000) + " " + healthLeft;
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd);
         
 
         arena.reset();
     }
 
-    public void announceWinner(StatisticsDatabase db, Player winner, Player loser) {
+    public void announceWinner(StatisticsDatabase db, Player winner, Player loser, long uTokenWinAmount) {
         IntegrationAPI api = CraftBlockchainPlugin.getAPI();
 
         UUID winnerUUID = winner.getUniqueId();
-        UUID loserUUID = loser.getUniqueId();
-
-        arena.sendMessage(winner.getName() + " wins!");        
+        UUID loserUUID = loser.getUniqueId();        
 
         db.setWins(winnerUUID, db.getWins(winnerUUID) + 1);
-        db.setLosses(loserUUID, db.getLosses(loserUUID) + 1);
+        db.setLosses(loserUUID, db.getLosses(loserUUID) + 1);        
         
 
         // Faucet funds to winner
-        api.faucetCraft(api.getWallet(winnerUUID), "You were got 2 TOKENS for winning.", 2).thenAccept((tx) -> {
-            winner.sendMessage("You got 2 TOKENS for winning. You should see this in your account within 15 seconds");
+        api.faucetUCraft(api.getWallet(winnerUUID), "You were got 2 TOKENS for winning.", uTokenWinAmount).thenAccept((tx) -> {
+            winner.sendMessage("You got " +uTokenWinAmount/1_000_000 + " " + api.getTokenName().toUpperCase() + " for winning. You should see this in your account within 15 seconds");
         });
 
         // TODO: Query redis pubsub for array of paid/interacted accounts (do via API)

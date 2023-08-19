@@ -90,17 +90,17 @@ public class JoinDuelsSubCmd extends DuelsSubCommand
             return true;
         }
 
-        payForArenaPurchase(plugin, api, player, args[0]);
+        payForArenaPurchase(plugin, api, player, args[0], a.getuTokenBetAmount());
         return true;
     }
 
     // TODO: Variable bets here
-    private static void payForArenaPurchase(Duels plugin, IntegrationAPI api, Player player, String arenaName) {
+    private static void payForArenaPurchase(Duels plugin, IntegrationAPI api, Player player, String arenaName, long uTokenBetAmount) {        
         Tx txinfo = new Tx(); // getTxID() -> auto generated. just a UUID [/wallet pending shows all]
         txinfo.setFromUUID(player.getUniqueId());
         txinfo.setToWalletAsServer(); // contract in the future?        
-        txinfo.setUCraftAmount(Duels.BET_AMOUNT); // bets of just 1 JUNOX (1mil ujunox)        
-        txinfo.setDescription("Purchased 1 bet for arena " + arenaName);
+        txinfo.setUCraftAmount(uTokenBetAmount); // bets of just 1 JUNOX (1mil ujunox)        
+        txinfo.setDescription("Purchase bet for arena " + arenaName);
         txinfo.setFunction(purchaseSingleBet(plugin, plugin.getArenaManager(), player, arenaName));
                 
         txinfo.setRedisMinuteTTL((int) Math.ceil(Duels.EXPIRE_SECONDS/60));

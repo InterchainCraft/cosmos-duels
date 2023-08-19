@@ -15,6 +15,8 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import com.crafteconomy.blockchain.CraftBlockchainPlugin;
+import com.crafteconomy.blockchain.api.IntegrationAPI;
 import com.crafteconomy.blockchain.utils.Util;
 
 import me.dartanman.duels.Duels;
@@ -24,6 +26,8 @@ import me.dartanman.duels.game.arenas.Arena;
 import me.dartanman.duels.utils.UIHelper;
 
 public class ArenasUISubCmd extends DuelsSubCommand implements Listener {
+
+	private IntegrationAPI api = CraftBlockchainPlugin.getAPI();
 
 	private String InvName = Util.color("&8&lDuels Arena List");
 	private int rows = 6 * 9;
@@ -141,14 +145,16 @@ public class ArenasUISubCmd extends DuelsSubCommand implements Listener {
 				break;
 			default:
 				break;
-		}
+		}		
 
-		return itemName + a.getName();
+		String cost = " &7&o(( &f" + (a.getuTokenBetAmount()/1_000_000) + api.getTokenName().toUpperCase() +  " &7&o))";
+
+		return itemName + a.getName() + cost;
 	}
 
 	private List<String> getArenaItemLore(Arena a) {
 		List<String> lore = new ArrayList<String>();
-		lore.add("&fArena: &f" + a.getName());
+		lore.add("&fArena: &f" + a.getName());		
 		lore.add("&7");
 		lore.add("&fPending Signers: &f" + getPendingSignersNames(a).toString());
 		lore.add("&7");

@@ -38,6 +38,7 @@ public class DuelCmd implements CommandExecutor
         new MainMenuSubCmd(plugin);
         new SpectateDuelsSubCmd(plugin);
         new PauseArenasSubCmd(plugin);
+        new SetArenaBetAmount(plugin);
     }
 
     // CommandExecutor

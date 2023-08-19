@@ -51,7 +51,12 @@ public class ArenaManager
             Location spawnTwo = ConfigUtils.getLocation(path + ".Spawn-Two");
             Location lobby = ConfigUtils.getLocation(path + ".Lobby");
             int countdownSeconds = plugin.getConfig().getInt(path + ".Countdown-Seconds");
-            Arena arena = new Arena(plugin, id, name, spawnOne, spawnTwo, lobby, countdownSeconds);
+            long uTokenBetAmount = plugin.getConfig().getLong(path + ".utoken-bet-amount");            
+            if(uTokenBetAmount == 0) {
+                uTokenBetAmount = 1_000_000;
+            }
+
+            Arena arena = new Arena(plugin, id, name, spawnOne, spawnTwo, lobby, countdownSeconds, uTokenBetAmount);
             arenaList.add(arena);
         }
     }
@@ -65,6 +70,7 @@ public class ArenaManager
         Location spawnTwo = arenaConfig.getSpawnTwo();
         Location lobby = arenaConfig.getLobby();
         int countdownSeconds = arenaConfig.getCountdownSeconds();
+        long uTokenBetAmt = arenaConfig.getuTokenBetAmount();
 
         plugin.getConfig().set("Arenas." + idStr + ".Name", name);
         plugin.getConfig().set("Arenas." + idStr + ".Countdown-Seconds", countdownSeconds);
@@ -86,6 +92,7 @@ public class ArenaManager
         plugin.getConfig().set("Arenas." + idStr + ".Lobby.Z", lobby.getZ());
         plugin.getConfig().set("Arenas." + idStr + ".Lobby.Yaw", lobby.getYaw());
         plugin.getConfig().set("Arenas." + idStr + ".Lobby.Pitch", lobby.getPitch());
+        plugin.getConfig().set("Arenas." + idStr + ".utoken-bet-amount", uTokenBetAmt);
         plugin.saveConfig();
 
         arenaList.add(new Arena(plugin, arenaConfig));

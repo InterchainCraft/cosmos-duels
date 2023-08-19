@@ -24,12 +24,14 @@ public class ArenaConfig
     private Location spawnTwo;
     private Location lobby;
     private int countdownSeconds;
+    private long uTokenBetAmount;
 
     public ArenaConfig(int id, String name)
     {
         this.id = id;
         this.name = name;
         this.countdownSeconds = 15;
+        this.uTokenBetAmount = 1_000_000;
     }
 
     public boolean isFinished()
@@ -85,5 +87,12 @@ public class ArenaConfig
     public void setCountdownSeconds(int countdownSeconds)
     {
         this.countdownSeconds = countdownSeconds;
+    }
+
+    public long getuTokenBetAmount() {
+        return uTokenBetAmount;
+    }
+    public void setuTokenBetAmount(long uTokenBetAmount) {
+        this.uTokenBetAmount = uTokenBetAmount;
     }
 }
